@@ -20,6 +20,13 @@ for(const app of apps) {
     const fd=fs.openSync(wasm,'r');const header=Buffer.alloc(4);fs.readSync(fd,header,0,4,0);fs.closeSync(fd);
     assert.equal(header.toString('hex'),'0061736d',`Invalid wasm: ${wasm}`);
   }
+  // HTML existence alone missed PhotoCraft's broken nested JS dependency.
+  for (const file of files.filter(f=>f.endsWith('.js'))) {
+    const source=fs.readFileSync(file,'utf8');
+    for (const match of source.matchAll(/(?:from\s*|import\s*\()(['"])(\.\.?\/[^'"]+\.js)\1/g)) {
+      assert(fs.existsSync(path.resolve(path.dirname(file),match[2])),`Broken module dependency ${app.id}: ${match[2]} in ${file}`);
+    }
+  }
   const html=fs.readFileSync(path.join(dir,'index.html'),'utf8');
   for(const match of html.matchAll(/(?:src|href)=["'](\.?\/?[^"'#?]+)["']/g)) {
     if (/^https?:|^data:/.test(match[1]))continue;
@@ -46,3 +53,4 @@ self.addEventListener('fetch',e=>{
 });
 `);
 console.log(`Verified ${apps.length} official apps; ${(total/1_000_000).toFixed(1)} MB. Shell ${version}.`);
+
