@@ -7,6 +7,7 @@ export function createWorkspace({ root, onHome, onOpened, toast, base }) {
   let bridge = false;
   let failed = false;
   let timer;
+  let startupPoll;
   const status = (text, failed = false) => {
     root.querySelector('.workspace-state').textContent = text;
     root.querySelector('.workspace-state').classList.toggle('failed', failed);
@@ -17,6 +18,7 @@ export function createWorkspace({ root, onHome, onOpened, toast, base }) {
   const close = () => {
     if (!canClose()) return false;
     clearTimeout(timer);
+    clearInterval(startupPoll);
     frame?.remove(); frame = null; current = null; dirty = false; bridge = false; failed = false;
     home(); return true;
   };
@@ -25,6 +27,8 @@ export function createWorkspace({ root, onHome, onOpened, toast, base }) {
     if (current && !close()) return;
     current = app;
     const showFailure = message => {
+      clearTimeout(timer);
+      clearInterval(startupPoll);
       failed = true;
       status('No pudo iniciar', true);
       const container = root.querySelector('.editor-container');
@@ -57,32 +61,44 @@ export function createWorkspace({ root, onHome, onOpened, toast, base }) {
     frame.allowFullscreen = true;
     frame.src = `${base}tools/${app.id}/index.html?host=parent`;
     frame.addEventListener('load', () => {
-      clearTimeout(timer);
       if (failed) return;
-      root.querySelector('.editor-loading')?.remove();
-      if (!bridge) status('Página cargada');
-      try {
-        const page = frame.contentDocument;
-        if (page?.querySelector('canvas')) {
-          const probe = document.createElement('canvas');
-          if (!probe.getContext('webgl2') && !navigator.gpu) {
-            showFailure('WebGL o WebGPU no disponibles'); return;
+      status('Iniciando editor…');
+      // iframe load only confirms the HTML; wasm and the editor start later.
+      clearInterval(startupPoll);
+      startupPoll = setInterval(() => {
+        if (failed || !frame) { clearInterval(startupPoll); return; }
+        try {
+          const page = frame.contentDocument;
+          if (!page) return;
+          const stopped = page.querySelector('[id$="_stopped"]');
+          if (stopped && !stopped.hidden) {
+            showFailure(stopped.textContent.trim()); return;
           }
-        }
-        if (!page?.querySelector('canvas') && !page?.querySelector('input[type=file]')) {
-          const text = page?.body?.textContent || '';
-          if (/404|not found|error|failed/i.test(text)) status('No pudo abrirse', true);
-        }
-      } catch { /* App state messages provide detailed errors when supported. */ }
+          const loading = page.querySelector('[id$="_loading"], #loading');
+          if (loading && getComputedStyle(loading).display !== 'none' && !loading.hidden) {
+            const text = loading.textContent || '';
+            if (/couldn't|could not|failed|no se pudo/i.test(text) && !/taking longer|trying again/i.test(text)) showFailure(text);
+            return;
+          }
+          if (page.querySelector('canvas, input[type=file]')) {
+            clearInterval(startupPoll); clearTimeout(timer);
+            root.querySelector('.editor-loading')?.remove();
+            status('Lista para trabajar');
+          }
+        } catch { /* Wait for the app's ready/failed message instead. */ }
+      }, 500);
     });
     root.querySelector('.editor-container').append(frame);
     timer = setTimeout(() => {
       const loading = root.querySelector('.editor-loading');
-      if (loading) {
+      if (loading && !bridge && !failed) {
+        status('La carga está tardando', true);
         loading.querySelector('p').textContent = 'La carga está tardando más de lo esperado. Revisa tu conexión o vuelve a intentarlo.';
         const retry = document.createElement('button');
         retry.className = 'button primary'; retry.textContent = 'Reintentar';
-        retry.onclick = () => { frame.src = `${base}tools/${app.id}/index.html?host=parent`; retry.remove(); };
+        retry.onclick = () => {
+          failed = true; close(); open(app);
+        };
         loading.append(retry);
       }
     }, 90000);
@@ -95,6 +111,8 @@ export function createWorkspace({ root, onHome, onOpened, toast, base }) {
     if (!data || typeof data.type !== 'string' || !data.type.startsWith(`${current.id}:`)) return;
     const kind = data.type.slice(current.id.length + 1);
     if (kind === 'ready') {
+      if (failed) return;
+      clearInterval(startupPoll);
       bridge = true; status('Lista para trabajar');
       clearTimeout(timer); root.querySelector('.editor-loading')?.remove();
       frame.contentWindow.postMessage({ type: `${current.id}:host`, version: '1', handoff: false }, location.origin);
@@ -124,3 +142,4 @@ export function createWorkspace({ root, onHome, onOpened, toast, base }) {
   });
   return { open, close, home, get current() { return current; }, get active() { return Boolean(current); } };
 }
+
