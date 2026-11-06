@@ -14,7 +14,7 @@ import zipfile
 ROOT = Path(__file__).resolve().parents[1]
 CACHE = ROOT / '.cache' / 'releases'
 OUT = ROOT / 'public' / 'tools'
-LAYOUT = 2
+LAYOUT = 3
 
 
 def download(url, destination):
@@ -54,11 +54,16 @@ def prepare_browser_entry(destination, app_id):
     loader = parts.parent / f'{app_id}-web.js'
     if not loader.exists():
         raise RuntimeError(f'Missing application loader: {app_id}')
+    # The packaged app loader imports ./snippets but upstream places those
+    # beside the bootstrap instead of beside app/photocraft-web.js.
+    snippets = destination / 'snippets'
+    if snippets.exists():
+        shutil.copytree(snippets, parts.parent / 'snippets', dirs_exist_ok=True)
     entry = destination / 'index.html'
     html = entry.read_text()
     script = f"""<script type="module">
-import init from './app/{app_id}-web.js';
 try {{
+  const {{ default: init }} = await import('./app/{app_id}-web.js');
   await init({{ module_or_path: new URL('./app/{wasm_name}', import.meta.url) }});
 }} catch (error) {{
   console.error('Editor startup failed', error);
