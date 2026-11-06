@@ -12,3 +12,82 @@
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
 
 [data-theme=dark] .open-app{color:#aeb4c0}
+
+/* Phone-only layout; desktop keeps its existing workspace and grid. */
+@media (max-width:640px) {
+  html,body { width:100%; min-width:0; }
+  .shell,main,.section-heading,.toolkit,.card-content { min-width:0; }
+  .topbar { gap:8px; }
+  .topbar-left { min-width:0; }
+  .topbar-actions { flex-shrink:0; }
+  .breadcrumb { flex-wrap:wrap; gap:6px; font-size:12px; }
+  .icon-button { width:44px; height:44px; }
+  .avatar { display:none; }
+  main { padding-left:calc(16px + var(--safe-left)); padding-right:calc(16px + var(--safe-right)); }
+  .intro { padding:24px 20px; min-height:0; }
+  .intro h1 { font-size:clamp(26px,7.5vw,34px); }
+  .intro-copy { font-size:14px; max-width:100%; }
+  .intro-meta { flex-wrap:wrap; gap:8px 12px; font-size:11px; line-height:1.5; }
+  .hero-art { display:none; }
+  .eyebrow { font-size:9px; line-height:1.6; }
+  .section-description { font-size:13px; line-height:1.6; }
+  .search-box { height:48px; margin-top:16px; }
+  .search-box input::placeholder { font-size:14px; }
+  .filter-row { min-width:0; }
+  .filters { min-width:0; width:100%; }
+  .filter { min-height:44px; padding:10px 13px; font-size:12px; }
+  .tool-card { padding:16px 12px 0; }
+  .card-top { align-items:center; gap:6px; margin-bottom:10px; }
+  .favorite-button { min-width:44px; min-height:44px; display:flex; align-items:center; justify-content:center; }
+  .favorite-button .icon { width:19px; height:19px; }
+  .app-label { font-size:10px; }
+  .card-content h3 { font-size:16px; line-height:1.35; overflow-wrap:anywhere; }
+  .card-content p { font-size:12px; min-height:0; line-height:1.6; }
+  .app-tags { font-size:10px; min-height:0; line-height:1.6; }
+  .card-bottom { flex-wrap:wrap; padding:8px 0; gap:4px; }
+  .app-category { font-size:10px; max-width:none; flex:1 1 100%; }
+  .open-app { min-height:44px; width:100%; justify-content:space-between; padding:8px 0; font-size:13px; }
+  .open-app .icon { width:17px; height:17px; }
+  .content-footer,.text-button { font-size:11px; line-height:1.6; }
+  .text-button { min-height:44px; text-align:left; }
+  .nav-item,.category-nav .nav-item { min-height:44px; font-size:14px; }
+  .resume-card { min-width:0; }
+  .resume-card strong { font-size:13px; overflow-wrap:anywhere; }
+  .resume-card small { font-size:11px; line-height:1.5; }
+  #workspace { height:100vh; height:100dvh; bottom:auto; }
+  .workspace-bar { gap:6px; padding:calc(6px + var(--safe-top)) calc(6px + var(--safe-right)) 6px calc(6px + var(--safe-left)); }
+  .back-home { min-width:44px; min-height:44px; padding:10px; flex-shrink:0; }
+  .workspace-title { min-width:0; flex:1; gap:7px; }
+  .workspace-title>div { min-width:0; }
+  .workspace-title strong { font-size:12px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .workspace-state { font-size:10px; line-height:1.4; }
+  .workspace-title>img { width:28px; height:28px; flex-shrink:0; }
+  .workspace-actions { flex-shrink:0; }
+  .workspace-actions .icon-button { width:44px; height:44px; }
+  .workspace-fullscreen { display:none; }
+  .editor-container { margin-left:var(--safe-left); margin-right:var(--safe-right); }
+  .editor-loading { overflow:auto; padding:20px; }
+  .editor-loading h2 { font-size:20px; overflow-wrap:anywhere; }
+  .editor-loading p { font-size:14px; }
+  .editor-loading small { font-size:12px; }
+  .editor-loading .button { min-height:44px; font-size:13px; }
+  dialog { width:calc(100vw - 24px - var(--safe-left) - var(--safe-right)); padding:18px; }
+  .credits-list>div>span { min-width:0; }
+  .credits-list strong { overflow-wrap:anywhere; }
+  .credits-list a { min-height:44px; display:flex; align-items:center; }
+}
+@media (max-width:379px) {
+  .tools-grid { grid-template-columns:minmax(0,1fr); }
+  .tool-card { padding:18px 18px 0; }
+  .card-bottom { flex-wrap:nowrap; }
+  .app-category { flex:1; }
+  .open-app { width:auto; min-width:80px; gap:12px; }
+  .intro-meta i { display:none; }
+  .breadcrumb>strong,.breadcrumb>span { display:none; }
+}
+/* Phones in landscape still reserve the notch and home indicator. */
+@media (max-width:950px) and (max-height:500px) and (orientation:landscape) {
+  #workspace { height:100dvh; bottom:auto; }
+  .workspace-bar { padding-left:calc(8px + var(--safe-left)); padding-right:calc(8px + var(--safe-right)); }
+  .editor-container { margin-left:var(--safe-left); margin-right:var(--safe-right); }
+}
