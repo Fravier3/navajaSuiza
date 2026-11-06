@@ -1,0 +1,126 @@
+import { icon } from '../components/icons';
+
+export function createWorkspace({ root, onHome, onOpened, toast, base }) {
+  let current = null;
+  let frame = null;
+  let dirty = false;
+  let bridge = false;
+  let failed = false;
+  let timer;
+  const status = (text, failed = false) => {
+    root.querySelector('.workspace-state').textContent = text;
+    root.querySelector('.workspace-state').classList.toggle('failed', failed);
+  };
+  const show = () => { root.hidden = false; document.body.classList.add('in-workspace'); };
+  const home = () => { root.hidden = true; document.body.classList.remove('in-workspace'); onHome(); };
+  const canClose = () => !current || failed || (bridge && !dirty) || confirm(`Se cerrará ${current.name}. Guarda o exporta tu trabajo antes de continuar. ¿Quieres cerrarla?`);
+  const close = () => {
+    if (!canClose()) return false;
+    clearTimeout(timer);
+    frame?.remove(); frame = null; current = null; dirty = false; bridge = false; failed = false;
+    home(); return true;
+  };
+  const open = app => {
+    if (current?.id === app.id) { show(); return; }
+    if (current && !close()) return;
+    current = app;
+    const showFailure = message => {
+      failed = true;
+      status('No pudo iniciar', true);
+      const container = root.querySelector('.editor-container');
+      container.querySelector('.editor-loading')?.remove();
+      const panel = document.createElement('div');
+      panel.className = 'editor-loading';
+      panel.innerHTML = `${icon('info')}<h2>No se pudo iniciar ${app.name}</h2><p></p><button class="button primary">Volver a las herramientas</button><a class="button" href="${app.source}/releases" target="_blank" rel="noopener">Ver versión para PC ${icon('external')}</a>`;
+      panel.querySelector('p').textContent = /WebGL|WebGPU|gpu|adapter|graphics/i.test(message) ? 'Este navegador no ofrece los gráficos que necesita el editor. Prueba Chrome o Edge con la aceleración gráfica habilitada, o usa la versión de escritorio.' : message.slice(0,300);
+      panel.querySelector('button').onclick = home;
+      container.append(panel);
+    };
+    root.showStartupFailure = showFailure;
+    root.innerHTML = `<header class="workspace-bar">
+      <button class="button back-home" title="Volver a las herramientas sin cerrar el editor">${icon('grid')}<span>Herramientas</span></button>
+      <div class="workspace-title"><img src="${base}app-icons/${app.id}.png" alt=""/><div><strong>${app.name}</strong><span class="workspace-state">Iniciando…</span></div></div>
+      <div class="workspace-actions"><button class="icon-button workspace-fullscreen" title="Pantalla completa" aria-label="Pantalla completa">${icon('expand')}</button><a class="icon-button" href="${base}tools/${app.id}/index.html" target="_blank" rel="noopener" title="Abrir otra sesión en una pestaña" aria-label="Abrir otra sesión en una pestaña">${icon('external')}</a><button class="icon-button workspace-close" title="Cerrar editor" aria-label="Cerrar editor">${icon('close')}</button></div>
+    </header><div class="editor-container"><div class="editor-loading"><span class="loader"></span><h2>Abriendo ${app.name}</h2><p>La primera carga puede tardar. Descargamos solo esta herramienta.</p><small>${Math.ceil(app.bytes / 1_000_000)} MB de paquete · ${app.version}</small></div></div>`;
+    root.querySelector('.back-home').onclick = home;
+    root.querySelector('.workspace-close').onclick = close;
+    root.querySelector('.workspace-fullscreen').onclick = async () => {
+      try {
+        if (document.fullscreenElement) await document.exitFullscreen();
+        else if (root.requestFullscreen) await root.requestFullscreen();
+        else toast('Puedes ampliar el editor con las opciones de tu navegador.');
+      } catch { toast('El navegador no permitió activar la pantalla completa.'); }
+    };
+    frame = document.createElement('iframe');
+    frame.title = `${app.name} — ${app.label}`;
+    frame.allow = 'fullscreen; clipboard-read; clipboard-write; microphone; camera';
+    frame.allowFullscreen = true;
+    frame.src = `${base}tools/${app.id}/index.html?host=parent`;
+    frame.addEventListener('load', () => {
+      clearTimeout(timer);
+      if (failed) return;
+      root.querySelector('.editor-loading')?.remove();
+      if (!bridge) status('Página cargada');
+      try {
+        const page = frame.contentDocument;
+        if (page?.querySelector('canvas')) {
+          const probe = document.createElement('canvas');
+          if (!probe.getContext('webgl2') && !navigator.gpu) {
+            showFailure('WebGL o WebGPU no disponibles'); return;
+          }
+        }
+        if (!page?.querySelector('canvas') && !page?.querySelector('input[type=file]')) {
+          const text = page?.body?.textContent || '';
+          if (/404|not found|error|failed/i.test(text)) status('No pudo abrirse', true);
+        }
+      } catch { /* App state messages provide detailed errors when supported. */ }
+    });
+    root.querySelector('.editor-container').append(frame);
+    timer = setTimeout(() => {
+      const loading = root.querySelector('.editor-loading');
+      if (loading) {
+        loading.querySelector('p').textContent = 'La carga está tardando más de lo esperado. Revisa tu conexión o vuelve a intentarlo.';
+        const retry = document.createElement('button');
+        retry.className = 'button primary'; retry.textContent = 'Reintentar';
+        retry.onclick = () => { frame.src = `${base}tools/${app.id}/index.html?host=parent`; retry.remove(); };
+        loading.append(retry);
+      }
+    }, 90000);
+    show(); onOpened(app);
+  };
+
+  window.addEventListener('message', event => {
+    if (!current || !frame || event.source !== frame.contentWindow || event.origin !== location.origin) return;
+    const data = event.data;
+    if (!data || typeof data.type !== 'string' || !data.type.startsWith(`${current.id}:`)) return;
+    const kind = data.type.slice(current.id.length + 1);
+    if (kind === 'ready') {
+      bridge = true; status('Lista para trabajar');
+      clearTimeout(timer); root.querySelector('.editor-loading')?.remove();
+      frame.contentWindow.postMessage({ type: `${current.id}:host`, version: '1', handoff: false }, location.origin);
+    } else if (kind === 'dirty') {
+      dirty = data.dirty === true;
+      status(dirty ? 'Cambios sin guardar' : 'Lista para trabajar');
+    } else if (kind === 'save') {
+      try {
+        if (!(data.bytes instanceof ArrayBuffer) && !ArrayBuffer.isView(data.bytes) && !(data.bytes instanceof Blob)) throw new Error('Invalid data');
+        const blob = data.bytes instanceof Blob ? data.bytes : new Blob([data.bytes]);
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url; link.download = String(data.name || 'documento').replace(/[\\/\u0000-\u001f]/g, '_').slice(0,255);
+        document.body.append(link); link.click(); link.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 60000);
+        // Browser downloads cannot confirm a completed disk write, so do not clear dirty.
+        toast('Descarga iniciada. Comprueba el archivo en tus descargas.');
+      } catch { toast('No se pudo descargar el archivo. Intenta exportarlo de nuevo.'); }
+    } else if (kind === 'failed') {
+      status('Se produjo un error', true);
+      if (!bridge) root.showStartupFailure(String(data.error || 'La herramienta no pudo iniciar.'));
+      else toast(String(data.error || 'La herramienta no pudo completar la operación.').slice(0,220));
+    }
+  });
+  window.addEventListener('beforeunload', event => {
+    if (current && !failed && (dirty || !bridge)) { event.preventDefault(); event.returnValue = ''; }
+  });
+  return { open, close, home, get current() { return current; }, get active() { return Boolean(current); } };
+}

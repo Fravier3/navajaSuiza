@@ -1,0 +1,13 @@
+{
+  "name": "navaja-suiza",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "prepare:apps": "python3 scripts/prepare_apps.py",
+    "build": "vite build && node scripts/verify-build.mjs",
+    "test": "node --test tests/*.test.mjs"
+  },
+  "devDependencies": { "vite": "8.3.6" }
+}

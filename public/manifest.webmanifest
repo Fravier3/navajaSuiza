@@ -1,0 +1,17 @@
+{
+  "id": "/navajaSuiza/",
+  "name": "Navaja Suiza",
+  "short_name": "Navaja Suiza",
+  "description": "Tu escritorio con 16 herramientas creativas y de productividad.",
+  "lang": "es",
+  "start_url": "/navajaSuiza/",
+  "scope": "/navajaSuiza/",
+  "display": "standalone",
+  "background_color": "#f7f8fa",
+  "theme_color": "#191b20",
+  "icons": [
+    {"src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+    {"src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+    {"src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ]
+}
