@@ -19,8 +19,27 @@ const definitions = [
   ['craft-anything', 'Craft Anything', 'Explorador de archivos', 'Utilidades', 'Identifica archivos desde el navegador.', 'Visor web · Análisis de archivos', '#638692', 'Explorador de archivos'],
 ];
 
+const menuNames = {
+  "pdfcraft": "Adobe PDF",
+  "wordcraft": "Word",
+  "gridcraft": "Excel",
+  "deckcraft": "PowerPoint",
+  "photocraft": "Adobe Photoshop",
+  "lightcraft": "Adobe Lightroom",
+  "vectorcraft": "Adobe Illustrator",
+  "designcraft": "Adobe InDesign",
+  "figcraft": "Figma",
+  "filmcraft": "Adobe Premiere Pro",
+  "effectcraft": "Adobe After Effects",
+  "soundcraft": "Pro Tools",
+  "cadcraft": "AutoCAD",
+  "texturecraft": "Adobe Substance 3D Painter",
+  "materialcraft": "Adobe Substance 3D Designer",
+  "craft-anything": "Explorador de archivos"
+};
+
 export const catalog = definitions.map(([id, name, label, category, description, tags, color, kind]) => ({
-  id, name, label, category, description, tags, color, kind,
+  id, name, menuName: menuNames[id], label, category, description, tags, color, kind,
   ...releases.find(app => app.id === id),
 }));
 export const categories = ['Todas', 'Documentos', 'Imagen y diseño', 'Video y audio', '3D y materiales', 'Utilidades'];
@@ -29,5 +48,5 @@ export function findApps({ query = '', category = 'Todas', favoritesOnly = false
   const needle = normalize(query.trim());
   return catalog.filter(app => (category === 'Todas' || category === app.category)
     && (!favoritesOnly || favorites.includes(app.id))
-    && normalize(`${app.name} ${app.label} ${app.description} ${app.tags}`).includes(needle));
+    && normalize(`${app.name} ${app.menuName} ${app.label} ${app.description} ${app.tags}`).includes(needle));
 }
