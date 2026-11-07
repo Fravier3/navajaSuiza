@@ -25,6 +25,7 @@ Var ArsenalExpandButton
 !macroend
 
 !ifndef BUILD_UNINSTALLER
+!macro customHeader
 Function ArsenalExpand
   ShowWindow $ArsenalToolCheckbox ${SW_SHOW}
   ShowWindow $ArsenalExplorerCheckbox ${SW_SHOW}
@@ -55,6 +56,7 @@ Function ArsenalOptionsLeave
   ${NSD_GetState} $ArsenalToolCheckbox $ArsenalTools
   ${NSD_GetState} $ArsenalExplorerCheckbox $ArsenalExplorer
 FunctionEnd
+!macroend
 !endif
 
 !macro customPageAfterChangeDir
