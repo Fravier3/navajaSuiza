@@ -2,9 +2,10 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {createRequire} from 'node:module';
 import path from 'node:path';
-import {catalog,findApps} from '../src/services/catalog.js';
+import {catalog,allCatalog,configureCatalog,findApps} from '../src/services/catalog.js';
 import {readPreferences} from '../src/services/storage.js';
 const {resolveAsset}=createRequire(import.meta.url)('../electron/paths.cjs');
+configureCatalog({proTools:true,explorer:true});
 test('Windows names preserve the 16 pinned engines and searchable aliases',()=>{
  assert.equal(catalog.length,16);assert.equal(new Set(catalog.map(a=>a.id)).size,16);
  for(const a of catalog){assert(a.menuName.endsWith('-FJ'));assert.match(a.sha256,/^[a-f0-9]{64}$/);}
@@ -22,4 +23,12 @@ test('Local protocol rejects traversal and foreign origins',()=>{
 test('Corrupt preferences do not prevent opening the desktop',()=>{
  assert.equal(readPreferences({getItem(){return '{bad'}}).theme,'dark');
  assert.deepEqual(readPreferences({getItem(){throw Error('blocked')}}).favorites,[]);
+});
+
+test('Optional tools are absent unless their installation flags are explicitly true',()=>{
+ configureCatalog();assert.equal(catalog.length,14);assert.equal(findApps({query:'Pro Tools'}).length,0);assert.equal(findApps({query:'Explorador'}).length,0);
+ configureCatalog({proTools:true});assert.equal(catalog.length,15);assert(catalog.some(a=>a.id==='soundcraft'));assert(!catalog.some(a=>a.id==='craft-anything'));
+ configureCatalog({explorer:true});assert.equal(catalog.length,15);assert(!catalog.some(a=>a.id==='soundcraft'));assert(catalog.some(a=>a.id==='craft-anything'));
+ configureCatalog({proTools:'true',explorer:1});assert.equal(catalog.length,14);
+ configureCatalog({proTools:true,explorer:true});assert.equal(catalog.length,16);
 });

@@ -38,10 +38,15 @@ const menuNames = {
   "craft-anything": "Explorador de archivos-FJ"
 };
 
-export const catalog = definitions.map(([id, name, label, category, description, tags, color, kind]) => ({
+export const allCatalog = definitions.map(([id, name, label, category, description, tags, color, kind]) => ({
   id, name, menuName: menuNames[id], label, category, description, tags, color, kind,
   ...releases.find(app => app.id === id),
 }));
+export let catalog = [];
+export function configureCatalog(options = {}) {
+ catalog = allCatalog.filter(a => (a.id !== 'soundcraft' || options.proTools === true) && (a.id !== 'craft-anything' || options.explorer === true));
+}
+configureCatalog();
 export const categories = ['Todas', 'Documentos', 'Imagen y diseño', 'Video y audio', '3D y materiales', 'Utilidades'];
 export function findApps({ query = '', category = 'Todas', favoritesOnly = false, favorites = [] } = {}) {
   const normalize = value => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();

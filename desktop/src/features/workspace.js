@@ -48,7 +48,7 @@ export function createWorkspace({ root, onHome, onOpened, toast, base }) {
       const panel = document.createElement('div');
       panel.className = 'editor-loading';
       panel.innerHTML = `${icon('info')}<h2>No se pudo iniciar ${app.menuName}</h2><p></p><button class="button primary">Volver a las herramientas</button><a class="button" href="${app.source}/releases" target="_blank" rel="noopener">Ver versión para PC ${icon('external')}</a>`;
-      panel.querySelector('p').textContent = /WebGL|WebGPU|gpu|adapter|graphics/i.test(message) ? 'El editor no pudo acceder a la aceleración gráfica. Actualiza el controlador de tu tarjeta gráfica y reinicia OmniDesk.' : message.slice(0,300);
+      panel.querySelector('p').textContent = /WebGL|WebGPU|gpu|adapter|graphics/i.test(message) ? 'El editor no pudo acceder a la aceleración gráfica. Actualiza el controlador de tu tarjeta gráfica y reinicia Arsenal.' : message.slice(0,300);
       panel.querySelector('button').onclick = home;
       container.append(panel);
     };
@@ -105,7 +105,7 @@ export function createWorkspace({ root, onHome, onOpened, toast, base }) {
       const loading = root.querySelector('.editor-loading');
       if (loading && !bridge && !failed) {
         status('La carga está tardando', true);
-        loading.querySelector('p').textContent = 'La carga está tardando más de lo esperado. Vuelve a intentarlo. Si persiste, reinicia OmniDesk.';
+        loading.querySelector('p').textContent = 'La carga está tardando más de lo esperado. Vuelve a intentarlo. Si persiste, reinicia Arsenal.';
         const retry = document.createElement('button');
         retry.className = 'button primary'; retry.textContent = 'Reintentar';
         retry.onclick = async () => {

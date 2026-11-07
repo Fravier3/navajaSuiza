@@ -1,4 +1,4 @@
-name: OmniDesk Windows installer
+name: Arsenal Windows installer
 on:
   push:
     branches: [omnidesk-windows]
@@ -37,27 +37,39 @@ jobs:
       - name: Install and test installed application
         shell: pwsh
         run: |
-          $installer = Get-Item release/OmniDesk-Setup-1.0.0-x64.exe
-          $destination = Join-Path $env:RUNNER_TEMP 'OmniDeskInstalled'
+          $installer = Get-Item release/Arsenal-Setup-1.1.0-x64.exe
+          $destination = Join-Path $env:RUNNER_TEMP 'ArsenalInstalled'
           $process = Start-Process -FilePath $installer.FullName -ArgumentList @('/S', "/D=$destination") -Wait -PassThru
           if ($process.ExitCode -ne 0) { throw "Installer failed: $($process.ExitCode)" }
-          $env:OMNIDESK_EXE = Join-Path $destination 'OmniDesk.exe'
-          if (!(Test-Path $env:OMNIDESK_EXE)) { throw 'Installed executable missing' }
+          $env:ARSENAL_EXE = Join-Path $destination 'Arsenal.exe'
+          if (!(Test-Path $env:ARSENAL_EXE)) { throw 'Installed executable missing' }
           npm run test:smoke
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node tests/document-export.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          if ((Get-Content (Join-Path $destination 'resources/install-options.json') -Raw | ConvertFrom-Json).proTools) { throw 'Pro Tools must default to hidden' }
+          if ((Get-Content (Join-Path $destination 'resources/install-options.json') -Raw | ConvertFrom-Json).explorer) { throw 'Explorer must default to hidden' }
           Get-FileHash $installer.FullName -Algorithm SHA256 | Format-List | Out-File release/SHA256.txt
-          $uninstaller = Join-Path $destination 'Uninstall OmniDesk.exe'
+          $uninstaller = Join-Path $destination 'Uninstall Arsenal.exe'
           $uninstall = Start-Process -FilePath $uninstaller -ArgumentList '/S' -Wait -PassThru
           if ($uninstall.ExitCode -ne 0) { throw 'Uninstall failed' }
+          $process = Start-Process -FilePath $installer.FullName -ArgumentList @('/S','/ENABLEPROTOOLS','/ENABLEEXPLORER', "/D=$destination") -Wait -PassThru
+          if ($process.ExitCode -ne 0) { throw 'Optional installation failed' }
+          $env:ARSENAL_EXPECT_OPTIONAL = '1'
+          npm run test:smoke
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $uninstall = Start-Process -FilePath $uninstaller -ArgumentList '/S' -Wait -PassThru
+          if ($uninstall.ExitCode -ne 0) { throw 'Optional uninstall failed' }
+
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: OmniDesk-Windows-QA
+          name: Arsenal-Windows-QA
           path: desktop/test-results/
       - uses: actions/upload-artifact@v4
         with:
-          name: OmniDesk-Windows-Installer
+          name: Arsenal-Windows-Installer
           path: |
-            desktop/release/OmniDesk-Setup-*.exe
+            desktop/release/Arsenal-Setup-*.exe
             desktop/release/SHA256.txt
           compression-level: 0

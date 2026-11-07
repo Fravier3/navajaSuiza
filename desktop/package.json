@@ -1,10 +1,10 @@
 {
-  "name": "omnidesk",
-  "productName": "OmniDesk",
-  "version": "1.0.0",
+  "name": "arsenal",
+  "productName": "Arsenal",
+  "version": "1.1.0",
   "private": true,
-  "description": "Tu estudio de creaci\u00f3n para Windows \u2014 Desarollos Francisco J Vazquez",
-  "author": "Francisco J Vazquez",
+  "description": "Arsenal \u2014 Desarrollado por Francisco J Vazquez Santiago",
+  "author": "Francisco J Vazquez Santiago",
   "type": "module",
   "main": "electron/main.cjs",
   "scripts": {
@@ -23,8 +23,8 @@
   },
   "build": {
     "appId": "com.franciscojvazquez.omnidesk",
-    "productName": "OmniDesk",
-    "copyright": "Desarollos Francisco J Vazquez",
+    "productName": "Arsenal",
+    "copyright": "Desarrollado por Francisco J Vazquez Santiago",
     "directories": {
       "output": "release",
       "buildResources": "public/icons"
@@ -52,8 +52,8 @@
           ]
         }
       ],
-      "icon": "public/icons/omnidesk.ico",
-      "artifactName": "OmniDesk-Setup-${version}-${arch}.${ext}"
+      "icon": "public/icons/arsenal.ico",
+      "artifactName": "Arsenal-Setup-${version}-${arch}.${ext}"
     },
     "nsis": {
       "oneClick": false,
@@ -61,13 +61,14 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "OmniDesk",
-      "installerIcon": "public/icons/omnidesk.ico",
-      "uninstallerIcon": "public/icons/omnidesk.ico",
+      "shortcutName": "Arsenal",
+      "installerIcon": "public/icons/arsenal.ico",
+      "uninstallerIcon": "public/icons/arsenal.ico",
       "deleteAppDataOnUninstall": false,
       "runAfterFinish": true,
       "language": "3082",
-      "displayLanguageSelector": true
+      "displayLanguageSelector": true,
+      "include": "installer/options.nsh"
     }
   }
 }
