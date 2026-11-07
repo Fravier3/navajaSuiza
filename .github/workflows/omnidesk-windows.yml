@@ -1,0 +1,63 @@
+name: OmniDesk Windows installer
+on:
+  push:
+    branches: [omnidesk-windows]
+    paths: ['desktop/**', 'scripts/prepare_apps.py', 'apps.lock.json', '.github/workflows/omnidesk-windows.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 45
+    defaults:
+      run:
+        working-directory: desktop
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: desktop/package-lock.json
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/cache@v4
+        with:
+          path: .cache/releases
+          key: omnidesk-engines-${{ hashFiles('apps.lock.json') }}
+      - run: npm ci
+      - run: npm test
+      - run: npm run prepare:apps
+      - run: npm run build
+      - run: npm run package:win
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+      - name: Install and test installed application
+        shell: pwsh
+        run: |
+          $installer = Get-Item release/OmniDesk-Setup-1.0.0-x64.exe
+          $destination = Join-Path $env:RUNNER_TEMP 'OmniDeskInstalled'
+          $process = Start-Process -FilePath $installer.FullName -ArgumentList @('/S', "/D=$destination") -Wait -PassThru
+          if ($process.ExitCode -ne 0) { throw "Installer failed: $($process.ExitCode)" }
+          $env:OMNIDESK_EXE = Join-Path $destination 'OmniDesk.exe'
+          if (!(Test-Path $env:OMNIDESK_EXE)) { throw 'Installed executable missing' }
+          npm run test:smoke
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Get-FileHash $installer.FullName -Algorithm SHA256 | Format-List | Out-File release/SHA256.txt
+          $uninstaller = Join-Path $destination 'Uninstall OmniDesk.exe'
+          $uninstall = Start-Process -FilePath $uninstaller -ArgumentList '/S' -Wait -PassThru
+          if ($uninstall.ExitCode -ne 0) { throw 'Uninstall failed' }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: OmniDesk-Windows-QA
+          path: desktop/test-results/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: OmniDesk-Windows-Installer
+          path: |
+            desktop/release/OmniDesk-Setup-*.exe
+            desktop/release/SHA256.txt
+          compression-level: 0

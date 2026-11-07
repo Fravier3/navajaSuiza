@@ -1,0 +1,73 @@
+{
+  "name": "omnidesk",
+  "productName": "OmniDesk",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Tu estudio de creaci\u00f3n para Windows \u2014 Desarollos Francisco J Vazquez",
+  "author": "Francisco J Vazquez",
+  "type": "module",
+  "main": "electron/main.cjs",
+  "scripts": {
+    "prepare:apps": "python ../scripts/prepare_apps.py && node scripts/copy-apps.mjs",
+    "build": "vite build",
+    "test": "node --test tests/*.test.mjs",
+    "start": "electron .",
+    "test:smoke": "node tests/smoke.mjs",
+    "package:win": "electron-builder --win nsis --x64 --publish never"
+  },
+  "devDependencies": {
+    "vite": "8.3.6",
+    "electron": "45.2.3",
+    "electron-builder": "26.18.0",
+    "playwright": "1.58.2"
+  },
+  "build": {
+    "appId": "com.franciscojvazquez.omnidesk",
+    "productName": "OmniDesk",
+    "copyright": "Desarollos Francisco J Vazquez",
+    "directories": {
+      "output": "release",
+      "buildResources": "public/icons"
+    },
+    "files": [
+      "dist/**/*",
+      "!dist/tools/**/*",
+      "electron/**/*",
+      "package.json"
+    ],
+    "asar": true,
+    "extraResources": [
+      {
+        "from": "dist/tools",
+        "to": "tools"
+      }
+    ],
+    "asarUnpack": [],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "public/icons/omnidesk.ico",
+      "artifactName": "OmniDesk-Setup-${version}-${arch}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "OmniDesk",
+      "installerIcon": "public/icons/omnidesk.ico",
+      "uninstallerIcon": "public/icons/omnidesk.ico",
+      "deleteAppDataOnUninstall": false,
+      "runAfterFinish": true,
+      "language": "3082",
+      "displayLanguageSelector": true
+    }
+  }
+}

@@ -1,0 +1,162 @@
+[
+  {
+    "id": "pdfcraft",
+    "version": "v0.19.0",
+    "asset": "pdfcraft-web-0.19.0.zip",
+    "url": "https://github.com/storytold/pdfcraft/releases/download/v0.19.0/pdfcraft-web-0.19.0.zip",
+    "sha256": "6cecea09db4d010f1ae18d4c3170db243c7adc653699ba2711f570d57fed6947",
+    "bytes": 19939263,
+    "source": "https://github.com/storytold/pdfcraft",
+    "release": "https://github.com/storytold/pdfcraft/releases/tag/v0.19.0"
+  },
+  {
+    "id": "photocraft",
+    "version": "v0.21.0",
+    "asset": "photocraft-web-0.21.0.zip",
+    "url": "https://github.com/storytold/photocraft/releases/download/v0.21.0/photocraft-web-0.21.0.zip",
+    "sha256": "3cf893112507ac192c921e0223a3bd5404a24b3dcf94e7a37d43f5eba2032286",
+    "bytes": 14408940,
+    "source": "https://github.com/storytold/photocraft",
+    "release": "https://github.com/storytold/photocraft/releases/tag/v0.21.0"
+  },
+  {
+    "id": "filmcraft",
+    "version": "v0.18.0",
+    "asset": "filmcraft-web-0.18.0.zip",
+    "url": "https://github.com/storytold/filmcraft/releases/download/v0.18.0/filmcraft-web-0.18.0.zip",
+    "sha256": "bc894b13f7876e49d3a4406ac6c46f4312fca3a80c83d7f80307eaf6d5b1877a",
+    "bytes": 15414113,
+    "source": "https://github.com/storytold/filmcraft",
+    "release": "https://github.com/storytold/filmcraft/releases/tag/v0.18.0"
+  },
+  {
+    "id": "wordcraft",
+    "version": "v0.16.0",
+    "asset": "wordcraft-web-0.16.0.zip",
+    "url": "https://github.com/storytold/wordcraft/releases/download/v0.16.0/wordcraft-web-0.16.0.zip",
+    "sha256": "612fcbe9c4fd8c8a2538e4b711dd78eb448859bbdb7f0f4517b26e99511d6f0e",
+    "bytes": 22269466,
+    "source": "https://github.com/storytold/wordcraft",
+    "release": "https://github.com/storytold/wordcraft/releases/tag/v0.16.0"
+  },
+  {
+    "id": "lightcraft",
+    "version": "v0.19.0",
+    "asset": "lightcraft-web-0.19.0.zip",
+    "url": "https://github.com/storytold/lightcraft/releases/download/v0.19.0/lightcraft-web-0.19.0.zip",
+    "sha256": "211e39578a0224513bef8b1f70ac89b0909d6838e5b6c89d0b9042aa88951bc0",
+    "bytes": 74296920,
+    "source": "https://github.com/storytold/lightcraft",
+    "release": "https://github.com/storytold/lightcraft/releases/tag/v0.19.0"
+  },
+  {
+    "id": "vectorcraft",
+    "version": "v0.22.0",
+    "asset": "vectorcraft-web-0.22.0.zip",
+    "url": "https://github.com/storytold/vectorcraft/releases/download/v0.22.0/vectorcraft-web-0.22.0.zip",
+    "sha256": "da3759eb0689ffe4b1e267e47e0fe71dd79b1f99faf939d0e86813622d74b889",
+    "bytes": 34167167,
+    "source": "https://github.com/storytold/vectorcraft",
+    "release": "https://github.com/storytold/vectorcraft/releases/tag/v0.22.0"
+  },
+  {
+    "id": "effectcraft",
+    "version": "v0.22.0",
+    "asset": "effectcraft-web-0.22.0.zip",
+    "url": "https://github.com/storytold/effectcraft/releases/download/v0.22.0/effectcraft-web-0.22.0.zip",
+    "sha256": "bdde079fd585adaca18cc456a3ce5577039894c99429b59a0375d64824ced554",
+    "bytes": 22229029,
+    "source": "https://github.com/storytold/effectcraft",
+    "release": "https://github.com/storytold/effectcraft/releases/tag/v0.22.0"
+  },
+  {
+    "id": "cadcraft",
+    "version": "v0.18.0",
+    "asset": "cadcraft-web-0.18.0.zip",
+    "url": "https://github.com/storytold/cadcraft/releases/download/v0.18.0/cadcraft-web-0.18.0.zip",
+    "sha256": "2440d15ebe28ce0a97f107a860f96d3bc21d98381b9f685676843b876a4d9086",
+    "bytes": 11252837,
+    "source": "https://github.com/storytold/cadcraft",
+    "release": "https://github.com/storytold/cadcraft/releases/tag/v0.18.0"
+  },
+  {
+    "id": "gridcraft",
+    "version": "v0.17.0",
+    "asset": "gridcraft-web-0.17.0.zip",
+    "url": "https://github.com/storytold/gridcraft/releases/download/v0.17.0/gridcraft-web-0.17.0.zip",
+    "sha256": "6fcd15c008b80945bc1a1d04757baed0800c69cc58525e62b9820c67b791176b",
+    "bytes": 9488811,
+    "source": "https://github.com/storytold/gridcraft",
+    "release": "https://github.com/storytold/gridcraft/releases/tag/v0.17.0"
+  },
+  {
+    "id": "designcraft",
+    "version": "v0.18.0",
+    "asset": "designcraft-web-0.18.0.zip",
+    "url": "https://github.com/storytold/designcraft/releases/download/v0.18.0/designcraft-web-0.18.0.zip",
+    "sha256": "f684454589af6c412eec51da190b774d84d3f4f7b333e96a78c359fa4fb8aca4",
+    "bytes": 27161221,
+    "source": "https://github.com/storytold/designcraft",
+    "release": "https://github.com/storytold/designcraft/releases/tag/v0.18.0"
+  },
+  {
+    "id": "deckcraft",
+    "version": "v0.16.0",
+    "asset": "deckcraft-web-0.16.0.zip",
+    "url": "https://github.com/storytold/deckcraft/releases/download/v0.16.0/deckcraft-web-0.16.0.zip",
+    "sha256": "8795d58ab02c30ad25f38525a79ee0e69c40b3d122e223dc04d2703827621f55",
+    "bytes": 11810397,
+    "source": "https://github.com/storytold/deckcraft",
+    "release": "https://github.com/storytold/deckcraft/releases/tag/v0.16.0"
+  },
+  {
+    "id": "figcraft",
+    "version": "v0.16.0",
+    "asset": "figcraft-web-0.16.0.zip",
+    "url": "https://github.com/storytold/figcraft/releases/download/v0.16.0/figcraft-web-0.16.0.zip",
+    "sha256": "0335d9719415cc915a1a18c7ffdd64daeef4b817a4d703df2e167c04a0996852",
+    "bytes": 10364028,
+    "source": "https://github.com/storytold/figcraft",
+    "release": "https://github.com/storytold/figcraft/releases/tag/v0.16.0"
+  },
+  {
+    "id": "soundcraft",
+    "version": "v0.18.0",
+    "asset": "soundcraft-web-0.18.0.zip",
+    "url": "https://github.com/storytold/soundcraft/releases/download/v0.18.0/soundcraft-web-0.18.0.zip",
+    "sha256": "c944fecc1aa332bfd0a6e3bd9719293489e8444cf46f575f8b3d38800d5d322b",
+    "bytes": 6865877,
+    "source": "https://github.com/storytold/soundcraft",
+    "release": "https://github.com/storytold/soundcraft/releases/tag/v0.18.0"
+  },
+  {
+    "id": "texturecraft",
+    "version": "v0.4.0",
+    "asset": "texturecraft-web-0.4.0.zip",
+    "url": "https://github.com/storytold/texturecraft/releases/download/v0.4.0/texturecraft-web-0.4.0.zip",
+    "sha256": "e423798c06ccfa455e51f12c5643fe0d8d752160ac8aaad9d20b1c001085e26c",
+    "bytes": 9180138,
+    "source": "https://github.com/storytold/texturecraft",
+    "release": "https://github.com/storytold/texturecraft/releases/tag/v0.4.0"
+  },
+  {
+    "id": "materialcraft",
+    "version": "v0.2.0",
+    "asset": "materialcraft-web-0.2.0.zip",
+    "url": "https://github.com/storytold/materialcraft/releases/download/v0.2.0/materialcraft-web-0.2.0.zip",
+    "sha256": "0bdf84607dcbd637adff124608f0ac3b96796647d3c6892cbec7054d2f637b0d",
+    "bytes": 4618296,
+    "source": "https://github.com/storytold/materialcraft",
+    "release": "https://github.com/storytold/materialcraft/releases/tag/v0.2.0"
+  },
+  {
+    "id": "craft-anything",
+    "version": "v0.5.0",
+    "asset": "craft-anything-web-0.5.0.zip",
+    "url": "https://github.com/storytold/craft-anything/releases/download/v0.5.0/craft-anything-web-0.5.0.zip",
+    "sha256": "0ee3a1383715be9d2600a6ffe3e0081ad9f00723a55677963f45372cbe915bfb",
+    "bytes": 2655983,
+    "source": "https://github.com/storytold/craft-anything",
+    "release": "https://github.com/storytold/craft-anything/releases/tag/v0.5.0"
+  }
+]
