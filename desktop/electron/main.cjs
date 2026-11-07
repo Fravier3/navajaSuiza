@@ -8,7 +8,7 @@ protocol.registerSchemesAsPrivileged([{ scheme:'omnidesk', privileges:{standard:
 app.setName('OmniDesk');
 app.setAppUserModelId('com.franciscojvazquez.omnidesk');
 if (process.env.OMNIDESK_TEST_PROFILE) app.setPath('userData', process.env.OMNIDESK_TEST_PROFILE);
-if (!app.requestSingleInstanceLock()) { app.quit(); } else {
+if (!process.env.OMNIDESK_TEST_PROFILE && !app.requestSingleInstanceLock()) { app.quit(); } else {
   let main;
   app.on('second-instance',()=>{if(main){if(main.isMinimized())main.restore(); main.focus();}});
   app.whenReady().then(async()=>{

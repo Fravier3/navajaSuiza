@@ -14,17 +14,29 @@ export function createWorkspace({ root, onHome, onOpened, toast, base }) {
   };
   const show = () => { root.hidden = false; document.body.classList.add('in-workspace'); };
   const home = () => { root.hidden = true; document.body.classList.remove('in-workspace'); onHome(); };
-  const canClose = () => !current || failed || (bridge && !dirty) || confirm(`Se cerrará ${current.name}. Guarda o exporta tu trabajo antes de continuar. ¿Quieres cerrarla?`);
-  const close = () => {
-    if (!canClose()) return false;
+  const canClose = async () => {
+    if (!current || failed || (bridge && !dirty)) return true;
+    return new Promise(resolve => {
+      const modal = document.createElement('dialog');
+      modal.innerHTML = '<h2>¿Cerrar esta herramienta?</h2><p>Guarda o exporta tu trabajo antes de continuar. Los cambios sin guardar pueden perderse.</p><div class="dialog-footer"><button class="button" data-stay>Seguir trabajando</button><button class="button primary" data-leave>Cerrar herramienta</button></div>';
+      document.body.append(modal);
+      const finish = value => {modal.close();modal.remove();resolve(value);};
+      modal.querySelector('[data-stay]').onclick=()=>finish(false);
+      modal.querySelector('[data-leave]').onclick=()=>finish(true);
+      modal.addEventListener('cancel',event=>{event.preventDefault();finish(false);});
+      modal.showModal();modal.querySelector('[data-stay]').focus();
+    });
+  };
+  const close = async () => {
+    if (!await canClose()) return false;
     clearTimeout(timer);
     clearInterval(startupPoll);
     frame?.remove(); frame = null; current = null; dirty = false; bridge = false; failed = false;
     home(); return true;
   };
-  const open = app => {
+  const open = async app => {
     if (current?.id === app.id) { show(); return; }
-    if (current && !close()) return;
+    if (current && !await close()) return;
     current = app;
     const showFailure = message => {
       clearTimeout(timer);
@@ -96,8 +108,8 @@ export function createWorkspace({ root, onHome, onOpened, toast, base }) {
         loading.querySelector('p').textContent = 'La carga está tardando más de lo esperado. Vuelve a intentarlo. Si persiste, reinicia OmniDesk.';
         const retry = document.createElement('button');
         retry.className = 'button primary'; retry.textContent = 'Reintentar';
-        retry.onclick = () => {
-          failed = true; close(); open(app);
+        retry.onclick = async () => {
+          failed = true; await close(); open(app);
         };
         loading.append(retry);
       }
