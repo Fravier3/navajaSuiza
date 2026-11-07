@@ -1,3 +1,4 @@
+!ifndef BUILD_UNINSTALLER
 !include "nsDialogs.nsh"
 !include "LogicLib.nsh"
 !include "FileFunc.nsh"
@@ -73,3 +74,5 @@ FunctionEnd
   FileWrite $R0 '{$\"proTools$\":$R1,$\"explorer$\":$R2}'
   FileClose $R0
 !macroend
+
+!endif
