@@ -125,7 +125,7 @@ export function createWorkspace({ root, onHome, onOpened, toast, base }) {
     if (kind === 'ready') {
       if (failed) return;
       clearInterval(startupPoll);
-      bridge = true; status('Lista para trabajar');
+      bridge = current.id !== 'capcut-fj'; status('Lista para trabajar');
       clearTimeout(timer); root.querySelector('.editor-loading')?.remove();
       frame.contentWindow.postMessage({ type: `${current.id}:host`, version: '1', handoff: false }, location.origin);
     } else if (kind === 'dirty') {

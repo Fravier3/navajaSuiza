@@ -6,9 +6,9 @@ import {catalog,allCatalog,configureCatalog,findApps} from '../src/services/cata
 import {readPreferences} from '../src/services/storage.js';
 const {resolveAsset}=createRequire(import.meta.url)('../electron/paths.cjs');
 configureCatalog({proTools:true,explorer:true});
-test('Windows names preserve the 16 pinned engines and searchable aliases',()=>{
- assert.equal(catalog.length,16);assert.equal(new Set(catalog.map(a=>a.id)).size,16);
- for(const a of catalog){assert(a.menuName.endsWith('-FJ'));assert.match(a.sha256,/^[a-f0-9]{64}$/);}
+test('Windows names preserve the 16 pinned engines plus OpenCut and searchable aliases',()=>{
+ assert.equal(catalog.length,17);assert.equal(new Set(catalog.map(a=>a.id)).size,17);
+ for(const a of catalog){assert(a.menuName.endsWith('-FJ'));if(a.id==='capcut-fj')assert.match(a.revision,/^[a-f0-9]{40}$/);else assert.match(a.sha256,/^[a-f0-9]{64}$/);}
  assert.equal(findApps({query:'Adobe Pro-FJ'})[0].id,'pdfcraft');
  assert.equal(findApps({query:'Word-FJ'})[0].id,'wordcraft');
  assert.equal(findApps({query:'calculo'})[0].id,'gridcraft');
@@ -26,9 +26,9 @@ test('Corrupt preferences do not prevent opening the desktop',()=>{
 });
 
 test('Optional tools are absent unless their installation flags are explicitly true',()=>{
- configureCatalog();assert.equal(catalog.length,14);assert.equal(findApps({query:'Pro Tools'}).length,0);assert.equal(findApps({query:'Explorador'}).length,0);
- configureCatalog({proTools:true});assert.equal(catalog.length,15);assert(catalog.some(a=>a.id==='soundcraft'));assert(!catalog.some(a=>a.id==='craft-anything'));
- configureCatalog({explorer:true});assert.equal(catalog.length,15);assert(!catalog.some(a=>a.id==='soundcraft'));assert(catalog.some(a=>a.id==='craft-anything'));
- configureCatalog({proTools:'true',explorer:1});assert.equal(catalog.length,14);
- configureCatalog({proTools:true,explorer:true});assert.equal(catalog.length,16);
+ configureCatalog();assert.equal(catalog.length,15);assert.equal(findApps({query:'Pro Tools'}).length,0);assert.equal(findApps({query:'Explorador'}).length,0);
+ configureCatalog({proTools:true});assert.equal(catalog.length,16);assert(catalog.some(a=>a.id==='soundcraft'));assert(!catalog.some(a=>a.id==='craft-anything'));
+ configureCatalog({explorer:true});assert.equal(catalog.length,16);assert(!catalog.some(a=>a.id==='soundcraft'));assert(catalog.some(a=>a.id==='craft-anything'));
+ configureCatalog({proTools:'true',explorer:1});assert.equal(catalog.length,15);
+ configureCatalog({proTools:true,explorer:true});assert.equal(catalog.length,17);
 });

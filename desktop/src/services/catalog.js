@@ -42,6 +42,7 @@ export const allCatalog = definitions.map(([id, name, label, category, descripti
   id, name, menuName: menuNames[id], label, category, description, tags, color, kind,
   ...releases.find(app => app.id === id),
 }));
+allCatalog.push({id:'capcut-fj',name:'OpenCut Classic',menuName:'CapCut-FJ',label:'Edición de video',category:'Video y audio',description:'Edita videos con línea de tiempo, texto y exportación local.',tags:'Video · Audio · Proyectos locales',color:'#eeeeee',kind:'Video',source:'https://github.com/opencut-app/opencut-classic',version:'Classic · cf5e79e',bytes:33000000,revision:'cf5e79e919144200294fb9fed22a222592a0aeea'});
 export let catalog = [];
 export function configureCatalog(options = {}) {
  catalog = allCatalog.filter(a => (a.id !== 'soundcraft' || options.proTools === true) && (a.id !== 'craft-anything' || options.explorer === true));
