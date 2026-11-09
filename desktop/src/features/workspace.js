@@ -35,6 +35,16 @@ export function createWorkspace({ root, onHome, onOpened, toast, base }) {
     home(); return true;
   };
   const open = async app => {
+    if (app.native) {
+      try {
+        if (!window.arsenalNative) throw new Error('Abre OmniGet-FJ desde Arsenal para Windows.');
+        const result = await window.arsenalNative.openOmniget();
+        if (!result.ok) throw new Error(result.error);
+        onOpened(app);
+        toast('OmniGet-FJ abierto en su propia ventana.');
+      } catch (error) { toast(error.message); }
+      return;
+    }
     if (current?.id === app.id) { show(); return; }
     if (current && !await close()) return;
     current = app;

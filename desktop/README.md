@@ -39,3 +39,7 @@ La instalación muestra 15 herramientas por defecto. Pro Tools-FJ y Explorador d
 OpenCut Classic MIT, revisión `cf5e79e919144200294fb9fed22a222592a0aeea`. El adaptador Vite sustituye las rutas Next por navegación local; conserva la edición, almacenamiento IndexedDB, medios y exportación del motor original. Sin servidor, cuenta ni base de datos externos. Las bibliotecas de sonidos de servidor y feedback no se incluyen. Transiciones y ajustes aún son funciones pendientes del motor upstream. Fuentes y stickers remotos o transcripción pueden requerir conexión y descargas. No es el producto oficial CapCut. El logo fue proporcionado por el usuario. La preparación descarga el código fijado y conserva su licencia en el instalador.
 
 Las reglas permanentes de mantenimiento están en `AGENTS.md`.
+
+## OmniGet-FJ (1.3.0)
+
+Acceso nativo independiente a OmniGet 0.15.1 sin modificar su ejecutable. El instalador incluye el binario portátil verificado por SHA-256, licencia GPL-3.0 y archivo de fuentes correspondiente. Ejecutar `npm run prepare:omniget` antes de empaquetar. El logo propio de Arsenal se usa en el catálogo; la ventana nativa conserva su identidad upstream. Sus datos portátiles se guardan en el perfil persistente OmniDesk/native/omniget. La ventana puede seguir abierta al cerrar Arsenal. La configuración inicial de OmniGet puede descargar yt-dlp/FFmpeg y requiere conexión; las funciones de IA externas son opcionales.

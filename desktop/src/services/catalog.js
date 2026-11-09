@@ -43,6 +43,7 @@ export const allCatalog = definitions.map(([id, name, label, category, descripti
   ...releases.find(app => app.id === id),
 }));
 allCatalog.push({id:'capcut-fj',name:'OpenCut Classic',menuName:'CapCut-FJ',label:'Edición de video',category:'Video y audio',description:'Edita videos con línea de tiempo, texto y exportación local.',tags:'Video · Audio · Proyectos locales',color:'#eeeeee',kind:'Video',source:'https://github.com/opencut-app/opencut-classic',version:'Classic · cf5e79e',bytes:33000000,revision:'cf5e79e919144200294fb9fed22a222592a0aeea'});
+allCatalog.push({id:'omniget-fj',name:'OmniGet',menuName:'OmniGet-FJ',label:'Descargas y conversión',category:'Utilidades',description:'Descarga video o audio y convierte tus archivos en una ventana independiente.',tags:'MP4 · MP3 · Subtítulos · Compresión',color:'#45d9d0',kind:'Descargas',source:'https://github.com/OpenSelena/omniget',version:'0.15.1',bytes:106133504,sha256:'b08853dc6e38bc3626e1c1cd407ffa842143a5b0554742e7a10ad819b70f8906',native:true});
 export let catalog = [];
 export function configureCatalog(options = {}) {
  catalog = allCatalog.filter(a => (a.id !== 'soundcraft' || options.proTools === true) && (a.id !== 'craft-anything' || options.explorer === true));

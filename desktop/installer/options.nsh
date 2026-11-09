@@ -36,7 +36,7 @@ Function ArsenalOptions
   !insertmacro MUI_HEADER_TEXT "Personaliza Arsenal" "Desarrollado por Francisco J Vazquez Santiago"
   nsDialogs::Create 1018
   Pop $R0
-  ${NSD_CreateLabel} 0 0 100% 35u "Arsenal incluye 14 herramientas visibles por defecto. Las herramientas opcionales solo aparecerán si las seleccionas aquí."
+  ${NSD_CreateLabel} 0 0 100% 35u "Arsenal incluye 16 herramientas visibles por defecto. Las herramientas opcionales solo aparecerán si las seleccionas aquí."
   Pop $R0
   ${NSD_CreateButton} 0 43u 75% 18u "Mostrar herramientas opcionales (avanzado)"
   Pop $ArsenalExpandButton

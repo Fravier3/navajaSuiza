@@ -6,7 +6,7 @@ import path from 'node:path';
 const profile=fs.mkdtempSync(path.join(os.tmpdir(),'arsenal-qa-'));
 fs.mkdirSync('test-results',{recursive:true});
 const results=[];
-const expected=process.env.ARSENAL_EXPECT_OPTIONAL==='1'?17:15;
+const expected=process.env.ARSENAL_EXPECT_OPTIONAL==='1'?18:16;
 async function launch(){return electron.launch({...(process.env.ARSENAL_EXE?{executablePath:process.env.ARSENAL_EXE}:{}),args:[...(process.env.ARSENAL_EXE?[]:['.']),...(process.platform==='linux'?['--no-sandbox','--ozone-platform=headless']:[]),'--use-angle=swiftshader','--enable-unsafe-swiftshader'],env:{...process.env,ARSENAL_TEST_PROFILE:profile},timeout:60000});}
 let application;
 try{
@@ -16,12 +16,12 @@ try{
  const errors=[];page.on('pageerror',error=>errors.push(String(error)));
  await page.locator('.tool-card').first().waitFor();
  assert.equal(await page.locator('.tool-card').count(),expected);
- assert.equal(await page.locator('[data-open=soundcraft]').count(),expected===17?1:0);
- assert.equal(await page.locator('[data-open=craft-anything]').count(),expected===17?1:0);
+ assert.equal(await page.locator('[data-open=soundcraft]').count(),expected===18?1:0);
+ assert.equal(await page.locator('[data-open=craft-anything]').count(),expected===18?1:0);
  assert.equal(await page.locator('.check-updates').count(),0);
  assert.equal(await page.title(),'Arsenal — Tu espacio de trabajo');
  assert.equal(await page.evaluate(()=>typeof window.require),'undefined');
- if(expected===15){
+ if(expected===16){
    await page.locator('#search').fill('Pro Tools');assert.equal(await page.locator('.tool-card').count(),0);
    await page.locator('#search').fill('Explorador');assert.equal(await page.locator('.tool-card').count(),0);
    const blocked=await page.evaluate(async()=>[await fetch('omnidesk://app/tools/soundcraft/index.html').then(r=>r.status),await fetch('omnidesk://app/tools/craft-anything/index.html').then(r=>r.status)]);
@@ -42,6 +42,7 @@ try{
  await page.route(/^https?:/,route=>route.abort());
  const ids=await page.locator('[data-open]').evaluateAll(es=>es.map(e=>e.dataset.open));
  for(const id of ids){
+   if(id==='omniget-fj')continue;
    if(process.env.ARSENAL_ONLY && id!==process.env.ARSENAL_ONLY)continue;
    await page.locator(`[data-open="${id}"]`).click();
    try{
@@ -58,7 +59,7 @@ try{
    await page.locator('#workspace').waitFor({state:'hidden'});
  }
  assert.equal(errors.length,0,errors.join('\n'));
- assert.equal(results.filter(r=>r.status==='Lista para trabajar').length,process.env.ARSENAL_ONLY?1:expected,JSON.stringify(results,null,2));
+ assert.equal(results.filter(r=>r.status==='Lista para trabajar').length,process.env.ARSENAL_ONLY?1:expected-1,JSON.stringify(results,null,2));
  console.log('PASS: installed offline editors, search, favorites persistence, views and renderer isolation.');
 }finally{
  fs.writeFileSync('test-results/smoke.json',JSON.stringify(results,null,2));
