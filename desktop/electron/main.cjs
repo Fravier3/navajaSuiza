@@ -3,7 +3,7 @@ const path = require('node:path');
 const fs = require('node:fs');
 const { pathToFileURL } = require('node:url');
 const { spawn } = require('node:child_process');
-const crypto = require('node:crypto');
+const { createOmnigetLauncher } = require('./omniget.cjs');
 const { resolveAsset } = require('./paths.cjs');
 const ORIGIN = 'omnidesk://app';
 protocol.registerSchemesAsPrivileged([{ scheme:'omnidesk', privileges:{standard:true,secure:true,supportFetchAPI:true,corsEnabled:true,stream:true} }]);
@@ -16,24 +16,16 @@ if (!process.env.ARSENAL_TEST_PROFILE && !app.requestSingleInstanceLock()) { app
   app.on('second-instance',()=>{if(main){if(main.isMinimized())main.restore(); main.focus();}});
   app.whenReady().then(async()=>{
     const root = path.join(__dirname,'../dist');
-    let omniChild;
+    const openOmniget = createOmnigetLauncher({
+      bundled: path.join(app.isPackaged ? process.resourcesPath : path.join(__dirname,'..'), 'native/omniget/OmniGet.exe'),
+      folder: path.join(app.getPath('userData'),'native','omniget'),
+      spawn
+    });
     ipcMain.handle('arsenal:open-omniget', async event => {
       if(event.sender !== main?.webContents || event.senderFrame !== main?.webContents.mainFrame || event.senderFrame.url !== ORIGIN+'/index.html') return {ok:false,error:'Origen no autorizado.'};
       if(process.platform !== 'win32') return {ok:false,error:'OmniGet-FJ requiere Windows.'};
       try {
-        if(omniChild && omniChild.exitCode === null) return {ok:true};
-        const bundled = path.join(app.isPackaged ? process.resourcesPath : path.join(__dirname,'..'), 'native/omniget/OmniGet.exe');
-        const expected = 'b08853dc6e38bc3626e1c1cd407ffa842143a5b0554742e7a10ad819b70f8906';
-        if(crypto.createHash('sha256').update(fs.readFileSync(bundled)).digest('hex') !== expected) throw new Error('El motor no pasó la verificación. Reinstala Arsenal.');
-        // Portable data belongs in the persistent profile, never in Program Files/resources.
-        const folder = path.join(app.getPath('userData'),'native','omniget');
-        fs.mkdirSync(folder,{recursive:true});
-        const executable = path.join(folder,'OmniGet.exe');
-        fs.copyFileSync(bundled,executable);
-        fs.writeFileSync(path.join(folder,'portable.txt'),'');
-        omniChild = spawn(executable,[],{cwd:folder,detached:true,stdio:'ignore',shell:false});
-        await new Promise((resolve,reject)=>{omniChild.once('spawn',resolve);omniChild.once('error',reject);});
-        omniChild.unref();
+        await openOmniget();
         return {ok:true};
       } catch(error) { return {ok:false,error:'No se pudo abrir OmniGet-FJ: '+error.message}; }
     });

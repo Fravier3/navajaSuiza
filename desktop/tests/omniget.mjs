@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 const profile=fs.mkdtempSync(path.join(os.tmpdir(),'omniget-qa-'));
-const application=await electron.launch({...(process.env.ARSENAL_EXE?{executablePath:process.env.ARSENAL_EXE}:{}),args:process.env.ARSENAL_EXE?[]:['.'],env:{...process.env,ARSENAL_TEST_PROFILE:profile},timeout:60000});
+let application=await electron.launch({...(process.env.ARSENAL_EXE?{executablePath:process.env.ARSENAL_EXE}:{}),args:process.env.ARSENAL_EXE?[]:['.'],env:{...process.env,ARSENAL_TEST_PROFILE:profile},timeout:60000});
 try {
  const page=await application.firstWindow();
  await page.locator('[data-open="omniget-fj"]').waitFor();
@@ -21,9 +21,20 @@ try {
    await new Promise(r=>setTimeout(r,1000));
  }
  assert(visible,'OmniGet native window did not appear');
+ const executable=path.join(profile,'native/omniget/OmniGet.exe');
+ const before=fs.statSync(executable).mtimeMs;
+ // Reproduce the reported failure: leave native OmniGet running and restart Arsenal.
+ await application.evaluate(({BrowserWindow})=>{for(const w of BrowserWindow.getAllWindows()){w.forceClose=true;w.destroy();}});
+ await application.close();
+ application=await electron.launch({...(process.env.ARSENAL_EXE?{executablePath:process.env.ARSENAL_EXE}:{}),args:process.env.ARSENAL_EXE?[]:['.'],env:{...process.env,ARSENAL_TEST_PROFILE:profile},timeout:60000});
+ const reopened=await application.firstWindow();
+ await reopened.locator('[data-open="omniget-fj"]').waitFor();
+ const results=await reopened.evaluate(()=>Promise.all([window.arsenalNative.openOmniget(),window.arsenalNative.openOmniget()]));
+ assert.deepEqual(results,[{ok:true},{ok:true}]);
+ assert.equal(fs.statSync(executable).mtimeMs,before,'Running executable was overwritten');
  execFileSync('powershell.exe',['-NoProfile','-Command',"Get-Process | Where-Object { $_.Path -eq '"+path.join(profile,'native/omniget/OmniGet.exe').replaceAll("'","''")+"' } | Stop-Process -Force" ]);
  fs.mkdirSync('test-results',{recursive:true});
- fs.writeFileSync('test-results/omniget.json',JSON.stringify({launch:true,nativeWindow:true,persistentPortableProfile:true}));
+ fs.writeFileSync('test-results/omniget.json',JSON.stringify({launch:true,nativeWindow:true,persistentPortableProfile:true,reopenWhileRunning:true,concurrentLaunch:true}));
 }finally{
  await application.evaluate(({BrowserWindow})=>{for(const w of BrowserWindow.getAllWindows()){w.forceClose=true;w.destroy();}}).catch(()=>{});
  await application.close();
