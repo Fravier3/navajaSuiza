@@ -43,9 +43,3 @@ Las reglas permanentes de mantenimiento están en `AGENTS.md`.
 ## OmniGet-FJ (1.3.0)
 
 Acceso nativo independiente a OmniGet 0.15.1 sin modificar su ejecutable. El instalador incluye el binario portátil verificado por SHA-256, licencia GPL-3.0 y archivo de fuentes correspondiente. Ejecutar `npm run prepare:omniget` antes de empaquetar. El logo propio de Arsenal se usa en el catálogo; la ventana nativa conserva su identidad upstream. Sus datos portátiles se guardan en el perfil persistente OmniDesk/native/omniget. La ventana puede seguir abierta al cerrar Arsenal. La configuración inicial de OmniGet puede descargar yt-dlp/FFmpeg y requiere conexión; las funciones de IA externas son opcionales.
-
-### Corrección 1.3.1
-
-Al reabrir Arsenal con OmniGet todavía ejecutándose, se reutiliza el ejecutable instalado si su SHA-256 coincide con el motor incluido. Ya no se intenta sobrescribir un `.exe` activo (EBUSY). Las aperturas simultáneas comparten una sola operación; si una futura actualización necesita reemplazar un motor bloqueado, se pide cerrar únicamente OmniGet, conservando su perfil. La prueba de Windows reinicia Arsenal dejando la ventana nativa abierta y verifica la reapertura sin modificar el archivo.
-
-OmniGet-FJ se compila desde las fuentes fijadas con un cambio de cierre: la X sale por el ciclo normal de la aplicación y conserva su limpieza de sesión, en vez de esconder la ventana en la bandeja. Se incluye el código modificado exacto y se deshabilita el reemplazo automático del binario upstream.

@@ -4,5 +4,3 @@ dist/
 public/tools/
 .openai/
 *.log
-
-desktop/.omniget-build/
