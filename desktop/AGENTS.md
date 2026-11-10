@@ -11,3 +11,10 @@
 - CapCut-FJ usa OpenCut Classic fijado en `capcut-fj/prepare.mjs`, compilado localmente e incluido en el instalador. No reemplazarlo con un enlace externo ni afirmar que es CapCut oficial.
 - Antes de entregar: `npm ci`, `npm test`, `npm run prepare:apps`, `npm run prepare:capcut`, `npm run build`, `npm run package:win`. Probar instalación, motores, exportación, preferencias y opciones en Windows mediante el workflow existente.
 - Actualizar versión de package.json/package-lock.json, pie de interfaz y nombre del instalador en workflow juntos. Entregar el `.exe` verificado.
+
+## Última entrega compilada válida
+
+- Base para próximas implementaciones: Arsenal 1.3.0 para Windows x64, instalador `Arsenal-Setup-1.3.0-x64.exe`, compilación verificada del commit `9af3d8821c25bd1775f1dbaf0c399e437154aab4` (Actions run `42701874288`). Incluye CapCut-FJ y OmniGet-FJ.
+- Instalador entregado: Library `libfile_19f93b56fdb48191a32a4e0134095e22`.
+- El intento 1.3.1 de corregir el cierre/EBUSY de OmniGet fue abandonado y revertido por petición del usuario. No tratarlo como entrega válida ni como base compilada. En 1.3.0 siguen pendientes el cierre a bandeja de OmniGet y la copia EBUSY al reabrirlo.
+- Antes de otra implementación, partir de esta base y conservar sus logos, preferencias y opciones de instalación. Actualizar este registro solo cuando exista una nueva entrega compilada real.
