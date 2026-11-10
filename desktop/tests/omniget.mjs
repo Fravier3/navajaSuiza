@@ -4,8 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 const profile=fs.mkdtempSync(path.join(os.tmpdir(),'omniget-qa-'));
-let console.log('OmniGet QA: Arsenal closed; restarting with native window running');
- application=await electron.launch({...(process.env.ARSENAL_EXE?{executablePath:process.env.ARSENAL_EXE}:{}),args:process.env.ARSENAL_EXE?[]:['.'],env:{...process.env,ARSENAL_TEST_PROFILE:profile},timeout:60000});
+let application=await electron.launch({...(process.env.ARSENAL_EXE?{executablePath:process.env.ARSENAL_EXE}:{}),args:process.env.ARSENAL_EXE?[]:['.'],env:{...process.env,ARSENAL_TEST_PROFILE:profile},timeout:60000});
 const watchdog=setTimeout(()=>{console.error('OmniGet QA exceeded 120 seconds');application.process()?.kill();process.exit(1);},120000);
 try {
  console.log('OmniGet QA: first launch');
