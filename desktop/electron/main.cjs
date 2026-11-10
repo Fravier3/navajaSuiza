@@ -19,7 +19,8 @@ if (!process.env.ARSENAL_TEST_PROFILE && !app.requestSingleInstanceLock()) { app
     const openOmniget = createOmnigetLauncher({
       bundled: path.join(app.isPackaged ? process.resourcesPath : path.join(__dirname,'..'), 'native/omniget/OmniGet.exe'),
       folder: path.join(app.getPath('userData'),'native','omniget'),
-      spawn
+      spawn,
+      expected: fs.readFileSync(path.join(app.isPackaged ? process.resourcesPath : path.join(__dirname,'..'), 'native/omniget/OmniGet.sha256'), 'utf8').trim()
     });
     ipcMain.handle('arsenal:open-omniget', async event => {
       if(event.sender !== main?.webContents || event.senderFrame !== main?.webContents.mainFrame || event.senderFrame.url !== ORIGIN+'/index.html') return {ok:false,error:'Origen no autorizado.'};

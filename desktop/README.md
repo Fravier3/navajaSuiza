@@ -47,3 +47,5 @@ Acceso nativo independiente a OmniGet 0.15.1 sin modificar su ejecutable. El ins
 ### Corrección 1.3.1
 
 Al reabrir Arsenal con OmniGet todavía ejecutándose, se reutiliza el ejecutable instalado si su SHA-256 coincide con el motor incluido. Ya no se intenta sobrescribir un `.exe` activo (EBUSY). Las aperturas simultáneas comparten una sola operación; si una futura actualización necesita reemplazar un motor bloqueado, se pide cerrar únicamente OmniGet, conservando su perfil. La prueba de Windows reinicia Arsenal dejando la ventana nativa abierta y verifica la reapertura sin modificar el archivo.
+
+OmniGet-FJ se compila desde las fuentes fijadas con un cambio de cierre: la X sale por el ciclo normal de la aplicación y conserva su limpieza de sesión, en vez de esconder la ventana en la bandeja. Se incluye el código modificado exacto y se deshabilita el reemplazo automático del binario upstream.

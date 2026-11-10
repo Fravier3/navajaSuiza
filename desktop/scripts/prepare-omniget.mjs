@@ -1,17 +1,39 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import {createHash} from 'node:crypto';
-const folder = path.resolve('native/omniget');
+import {execFileSync} from 'node:child_process';
+const revision='ee980281130972b42c3b266cba2b2dbfbedd155b';
+const folder=path.resolve('native/omniget');
+const work=path.resolve('.omniget-build');
 await fs.mkdir(folder,{recursive:true});
-const url='https://github.com/OpenSelena/omniget/releases/download/v0.15.1/omniget_0.15.1_x64-portable.exe';
-const expected='b08853dc6e38bc3626e1c1cd407ffa842143a5b0554742e7a10ad819b70f8906';
-const response=await fetch(url);if(!response.ok)throw Error(`OmniGet download: ${response.status}`);
-const bytes=Buffer.from(await response.arrayBuffer());
-if(createHash('sha256').update(bytes).digest('hex')!==expected)throw Error('OmniGet checksum mismatch');
+await fs.mkdir(work,{recursive:true});
+const archive=path.join(work,'source.tar.gz');
+const response=await fetch(`https://codeload.github.com/OpenSelena/omniget/tar.gz/${revision}`);
+if(!response.ok)throw Error(`OmniGet source: ${response.status}`);
+await fs.writeFile(archive,Buffer.from(await response.arrayBuffer()));
+execFileSync('tar',['-xzf',archive,'-C',work],{stdio:'inherit'});
+const source=path.join(work,`omniget-${revision}`);
+const lib=path.join(source,'src-tauri/src/lib.rs');
+let rust=await fs.readFile(lib,'utf8');
+const old='api.prevent_close();\n                let _ = window.hide();';
+if(!rust.includes(old))throw Error('OmniGet close patch no longer matches');
+rust=rust.replace(old,'api.prevent_close();\n                window.app_handle().exit(0); // Arsenal: Close means exit, not hide to tray.');
+await fs.writeFile(lib,rust);
+// Do not let the upstream updater replace this customized close behavior.
+const updater=path.join(source,'src-tauri/tauri.conf.json');
+const config=JSON.parse(await fs.readFile(updater,'utf8'));
+config.plugins.updater.endpoints=[];
+config.bundle.createUpdaterArtifacts=false;
+await fs.writeFile(updater,JSON.stringify(config,null,2)+'\n');
+const run=(args)=>execFileSync(process.platform==='win32'?'pnpm.cmd':'pnpm',args,{cwd:source,stdio:'inherit',shell:process.platform==='win32'});
+run(['install','--frozen-lockfile']);
+run(['tauri','build','--no-bundle']);
+const executable=path.join(source,'src-tauri/target/release/omniget.exe');
+const bytes=await fs.readFile(executable);
 await fs.writeFile(path.join(folder,'OmniGet.exe'),bytes);
-for(const [name,url] of [['LICENSE','https://raw.githubusercontent.com/OpenSelena/omniget/ee980281130972b42c3b266cba2b2dbfbedd155b/LICENSE'],['omniget-v0.15.1-source.tar.gz','https://codeload.github.com/OpenSelena/omniget/tar.gz/ee980281130972b42c3b266cba2b2dbfbedd155b']]){
- const res=await fetch(url);if(!res.ok)throw Error(`${name}: ${res.status}`);
- await fs.writeFile(path.join(folder,name),Buffer.from(await res.arrayBuffer()));
-}
-await fs.writeFile(path.join(folder,'NOTICE.txt'),'OmniGet-FJ is an Arsenal launcher name. The bundled OmniGet 0.15.1 binary is unmodified, provided by OpenSelena under GPL-3.0. Corresponding source archive and license are included here. Source: https://github.com/OpenSelena/omniget/tree/ee980281130972b42c3b266cba2b2dbfbedd155b\n');
-console.log('OmniGet 0.15.1 verified; binary, license and source included.');
+await fs.writeFile(path.join(folder,'OmniGet.sha256'),createHash('sha256').update(bytes).digest('hex')+'\n');
+await fs.copyFile(path.join(source,'LICENSE'),path.join(folder,'LICENSE'));
+// Include the exact modified sources, excluding generated dependencies and output.
+execFileSync('tar',['--exclude=node_modules','--exclude=target','--exclude=.svelte-kit','--exclude=build','-czf',path.join(folder,'omniget-v0.15.1-arsenal-source.tar.gz'),'-C',source,'.'],{stdio:'inherit'});
+await fs.writeFile(path.join(folder,'NOTICE.txt'),`OmniGet-FJ / Arsenal: modified OmniGet 0.15.1, GPL-3.0. Based on OpenSelena revision ${revision}. Changes: main-window Close exits through the normal application lifecycle instead of hiding to tray; upstream binary updates disabled to preserve this change. Exact modified source and license included.\n`);
+console.log('Customized OmniGet built: Close exits completely; source and checksum included.');

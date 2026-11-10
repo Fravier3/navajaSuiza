@@ -44,9 +44,14 @@ try {
  assert.deepEqual(results,[{ok:true},{ok:true}]);
  console.log('OmniGet QA: reopened successfully');
  assert.equal(fs.statSync(executable).mtimeMs,before,'Running executable was overwritten');
- execFileSync('powershell.exe',['-NoProfile','-Command',"Get-Process | Where-Object { $_.Path -eq '"+path.join(profile,'native/omniget/OmniGet.exe').replaceAll("'","''")+"' } | Stop-Process -Force" ]);
+ const escaped=executable.replaceAll("'","''");
+ execFileSync('powershell.exe',['-NoProfile','-Command',`$p=Get-Process | Where-Object { $_.Path -eq '${escaped}' }; foreach($item in $p){$null=$item.CloseMainWindow(); if(!$item.WaitForExit(15000)){throw 'Close hid OmniGet instead of exiting'}}`]);
+ console.log('OmniGet QA: Close exited the native process completely');
+ assert.deepEqual(await reopened.evaluate(()=>window.arsenalNative.openOmniget()),{ok:true});
+ console.log('OmniGet QA: launch after Close succeeded');
+ execFileSync('powershell.exe',['-NoProfile','-Command',`Get-Process | Where-Object { $_.Path -eq '${escaped}' } | Stop-Process -Force`]);
  fs.mkdirSync('test-results',{recursive:true});
- fs.writeFileSync('test-results/omniget.json',JSON.stringify({launch:true,nativeWindow:true,persistentPortableProfile:true,reopenWhileRunning:true,concurrentLaunch:true}));
+ fs.writeFileSync('test-results/omniget.json',JSON.stringify({launch:true,nativeWindow:true,persistentPortableProfile:true,reopenWhileRunning:true,concurrentLaunch:true,closeExitsProcess:true,relaunchAfterClose:true}));
 }finally{
  await stopArsenal();
  clearTimeout(watchdog);
