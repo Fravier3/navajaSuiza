@@ -1,3 +1,4 @@
+import { showOmnigetTrayNotice } from './omniget-tray';
 import { icon } from '../components/icons';
 
 export function createWorkspace({ root, onHome, onOpened, toast, base }) {
@@ -39,6 +40,7 @@ export function createWorkspace({ root, onHome, onOpened, toast, base }) {
       try {
         if (!window.arsenalNative) throw new Error('Abre OmniGet-FJ desde Arsenal para Windows.');
         const result = await window.arsenalNative.openOmniget();
+        if (result.alreadyOpen) { showOmnigetTrayNotice(base); return; }
         if (!result.ok) throw new Error(result.error);
         onOpened(app);
         toast('OmniGet-FJ abierto en su propia ventana.');

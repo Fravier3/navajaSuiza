@@ -21,7 +21,7 @@ if (!process.env.ARSENAL_TEST_PROFILE && !app.requestSingleInstanceLock()) { app
       if(event.sender !== main?.webContents || event.senderFrame !== main?.webContents.mainFrame || event.senderFrame.url !== ORIGIN+'/index.html') return {ok:false,error:'Origen no autorizado.'};
       if(process.platform !== 'win32') return {ok:false,error:'OmniGet-FJ requiere Windows.'};
       try {
-        if(omniChild && omniChild.exitCode === null) return {ok:true};
+        if(omniChild && omniChild.exitCode === null) return {ok:true,alreadyOpen:true};
         const bundled = path.join(app.isPackaged ? process.resourcesPath : path.join(__dirname,'..'), 'native/omniget/OmniGet.exe');
         const expected = 'b08853dc6e38bc3626e1c1cd407ffa842143a5b0554742e7a10ad819b70f8906';
         if(crypto.createHash('sha256').update(fs.readFileSync(bundled)).digest('hex') !== expected) throw new Error('El motor no pasó la verificación. Reinstala Arsenal.');
@@ -35,7 +35,10 @@ if (!process.env.ARSENAL_TEST_PROFILE && !app.requestSingleInstanceLock()) { app
         await new Promise((resolve,reject)=>{omniChild.once('spawn',resolve);omniChild.once('error',reject);});
         omniChild.unref();
         return {ok:true};
-      } catch(error) { return {ok:false,error:'No se pudo abrir OmniGet-FJ: '+error.message}; }
+      } catch(error) {
+        if(error.code === 'EBUSY' && error.syscall === 'copyfile') return {ok:false,alreadyOpen:true};
+        return {ok:false,error:'No se pudo abrir OmniGet-FJ: '+error.message};
+      }
     });
     const tools = app.isPackaged ? path.join(process.resourcesPath,'tools') : path.join(root,'tools');
     let installOptions = {};
