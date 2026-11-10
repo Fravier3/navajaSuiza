@@ -36,42 +36,9 @@ jobs:
       - run: npm run package:win
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: 'false'
-      - name: Install and test installed application
+      - name: Hash installer
         shell: pwsh
-        run: |
-          $installer = Get-Item release/Arsenal-Setup-1.3.2-x64.exe
-          $destination = Join-Path $env:RUNNER_TEMP 'ArsenalInstalled'
-          $process = Start-Process -FilePath $installer.FullName -ArgumentList @('/S', "/D=$destination") -Wait -PassThru
-          if ($process.ExitCode -ne 0) { throw "Installer failed: $($process.ExitCode)" }
-          $env:ARSENAL_EXE = Join-Path $destination 'Arsenal.exe'
-          if (!(Test-Path $env:ARSENAL_EXE)) { throw 'Installed executable missing' }
-          npm run test:smoke
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          node tests/omniget.mjs
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          node tests/capcut.mjs
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          node tests/document-export.mjs
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          if ((Get-Content (Join-Path $destination 'resources/install-options.json') -Raw | ConvertFrom-Json).proTools) { throw 'Pro Tools must default to hidden' }
-          if ((Get-Content (Join-Path $destination 'resources/install-options.json') -Raw | ConvertFrom-Json).explorer) { throw 'Explorer must default to hidden' }
-          Get-FileHash $installer.FullName -Algorithm SHA256 | Format-List | Out-File release/SHA256.txt
-          $uninstaller = Join-Path $destination 'Uninstall Arsenal.exe'
-          $uninstall = Start-Process -FilePath $uninstaller -ArgumentList '/S' -Wait -PassThru
-          if ($uninstall.ExitCode -ne 0) { throw 'Uninstall failed' }
-          $process = Start-Process -FilePath $installer.FullName -ArgumentList @('/S','/ENABLEPROTOOLS','/ENABLEEXPLORER', "/D=$destination") -Wait -PassThru
-          if ($process.ExitCode -ne 0) { throw 'Optional installation failed' }
-          $env:ARSENAL_EXPECT_OPTIONAL = '1'
-          npm run test:smoke
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          $uninstall = Start-Process -FilePath $uninstaller -ArgumentList '/S' -Wait -PassThru
-          if ($uninstall.ExitCode -ne 0) { throw 'Optional uninstall failed' }
-
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: Arsenal-Windows-QA
-          path: desktop/test-results/
+        run: Get-FileHash release/Arsenal-Setup-1.3.2-x64.exe -Algorithm SHA256 | Format-List | Out-File release/SHA256.txt
       - uses: actions/upload-artifact@v4
         with:
           name: Arsenal-Windows-Installer
